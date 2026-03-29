@@ -1379,7 +1379,7 @@ async function submitForm() {
       if (member) {
         cardsData.push({
           member,
-          format_tag:     formatTag    || null,
+          card_format:    formatTag    || null,
           variant_label:  variantLabel || null,
           notes:          notes        || null,
         });
@@ -1394,10 +1394,10 @@ async function submitForm() {
       contributor_id:     contributorId,
       artist_name:        document.getElementById('artist').value.trim(),
       release_name:       document.getElementById('release').value.trim(),
-      release_type:       document.getElementById('releaseType').value || null,
-      market:             document.getElementById('market').value || null,
+      release_format:     document.getElementById('releaseType').value || null,
+      release_market:     document.getElementById('market').value || null,
       version_name:       document.getElementById('version').value.trim(),
-      source_tag:         document.getElementById('sourceTagVal').value || null,
+      source:             document.getElementById('sourceTagVal').value || null,
       retailer:           document.getElementById('retailer').value || null,
       release_date:       releaseDate || null,
       source_url:         document.getElementById('sourceUrl').value.trim() || null,
