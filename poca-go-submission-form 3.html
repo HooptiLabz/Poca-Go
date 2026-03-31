@@ -1,0 +1,1518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Poca-Go — Catalog Submission</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --bg:              #1a1714;
+    --bg2:             #211e1a;
+    --bg3:             #2a2520;
+    --bg4:             #322d28;
+    --bg5:             #3d3630;
+    --orange:          #d4622a;
+    --orange-light:    #e8784a;
+    --orange-dim:      rgba(212,98,42,0.14);
+    --lavender:        #a89bc2;
+    --lavender-dim:    rgba(168,155,194,0.12);
+    --eggshell:        #f0ece4;
+    --eggshell-dim:    #a09890;
+    --eggshell-faint:  rgba(240,236,228,0.05);
+    --border:          rgba(240,236,228,0.08);
+    --border-accent:   rgba(212,98,42,0.3);
+    --border-mid:      rgba(240,236,228,0.12);
+    --border-strong:   rgba(240,236,228,0.18);
+    --green:           #4caf82;
+    --green-dim:       rgba(76,175,130,0.12);
+    --green-border:    rgba(76,175,130,0.28);
+    --red:             #e05555;
+    --red-dim:         rgba(224,85,85,0.1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--eggshell);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0; opacity: 0.5;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    top: -100px; left: 50%;
+    transform: translateX(-50%);
+    width: 600px; height: 280px;
+    background: radial-gradient(ellipse, rgba(212,98,42,0.06) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  .page-wrap {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 24px 100px;
+    position: relative; z-index: 1;
+  }
+
+  /* ── HEADER ── */
+  .site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 28px 0 22px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 44px;
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    letter-spacing: 0.16em;
+    color: var(--orange);
+  }
+
+  .header-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.16em;
+    color: var(--eggshell-dim);
+    text-transform: uppercase;
+    background: var(--bg3);
+    border: 1px solid var(--border-mid);
+    padding: 5px 11px;
+    border-radius: 6px;
+  }
+
+  /* ── PAGE TITLE ── */
+  .page-title-block { margin-bottom: 44px; }
+
+  .page-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--orange);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    opacity: 0.85;
+  }
+
+  .page-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 54px;
+    letter-spacing: 0.04em;
+    color: var(--eggshell);
+    line-height: 0.95;
+    margin-bottom: 16px;
+  }
+
+  .page-subtitle {
+    font-size: 14px;
+    color: var(--eggshell-dim);
+    line-height: 1.65;
+    max-width: 500px;
+  }
+
+  /* ── PROGRESS TRACK — 3 steps ── */
+  .progress-track {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 52px;
+    position: relative;
+  }
+
+  .progress-track::before {
+    content: '';
+    position: absolute;
+    top: 13px; left: 13px; right: 13px;
+    height: 1px;
+    background: var(--border-mid);
+    z-index: 0;
+  }
+
+  .progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 9px;
+    flex: 1;
+    position: relative; z-index: 1;
+    cursor: pointer;
+  }
+
+  .step-dot {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--bg3);
+    border: 1.5px solid var(--border-mid);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--eggshell-dim);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .progress-step.active .step-dot {
+    background: var(--orange);
+    border-color: var(--orange);
+    color: #fff;
+    box-shadow: 0 0 0 4px rgba(212,98,42,0.16), 0 0 20px rgba(212,98,42,0.28);
+    transform: scale(1.1);
+  }
+
+  .progress-step.done .step-dot {
+    background: var(--bg4);
+    border-color: var(--green);
+    color: var(--green);
+    font-size: 12px;
+  }
+
+  .step-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--eggshell-dim);
+    text-align: center;
+    opacity: 0.65;
+    transition: all 0.2s;
+  }
+
+  .progress-step.active .step-label { color: var(--orange); opacity: 1; font-weight: 500; }
+  .progress-step.done .step-label   { color: var(--green); opacity: 0.75; }
+
+  /* ── SECTIONS ── */
+  .form-section {
+    display: none;
+    animation: sectionIn 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .form-section.active { display: block; }
+
+  @keyframes sectionIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-heading {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 32px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    line-height: 1;
+    color: var(--border-accent);
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+    padding-top: 1px;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 0.1em;
+    color: var(--eggshell);
+    line-height: 1.05;
+    margin-bottom: 5px;
+  }
+
+  .section-desc {
+    font-size: 13px;
+    color: var(--eggshell-dim);
+    line-height: 1.55;
+  }
+
+  /* ── FIELDS ── */
+  .field-group { margin-bottom: 22px; }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+
+  .field-row > .field-group { margin-bottom: 0; }
+
+  label {
+    display: block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--eggshell-dim);
+    margin-bottom: 8px;
+  }
+
+  label .required { color: var(--orange); margin-left: 3px; }
+
+  label .hint {
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--lavender);
+    font-size: 10px;
+    margin-left: 6px;
+    opacity: 0.85;
+  }
+
+  input[type="text"],
+  input[type="date"],
+  select,
+  textarea {
+    width: 100%;
+    background: var(--bg3);
+    border: 1.5px solid var(--border-mid);
+    border-radius: 10px;
+    padding: 11px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--eggshell);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    -webkit-appearance: none;
+  }
+
+  input[type="text"]::placeholder,
+  textarea::placeholder {
+    color: rgba(160,152,144,0.28);
+    font-style: italic;
+    font-size: 13px;
+  }
+
+  input[type="text"]:focus,
+  input[type="date"]:focus,
+  select:focus,
+  textarea:focus {
+    border-color: var(--border-accent);
+    box-shadow: 0 0 0 3px rgba(212,98,42,0.07);
+    background: var(--bg2);
+  }
+
+  input.has-value, select.has-value, textarea.has-value {
+    border-color: rgba(76,175,130,0.22);
+  }
+
+  textarea { resize: vertical; min-height: 88px; line-height: 1.55; }
+
+  select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a09890' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 13px center;
+    padding-right: 36px;
+  }
+
+  select option { background: var(--bg3); color: var(--eggshell); }
+
+  /* ── TAG PILLS ── */
+  .tag-grid { display: flex; flex-wrap: wrap; gap: 7px; }
+
+  .tag-pill {
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border-mid);
+    background: var(--bg3);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--eggshell-dim);
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+    line-height: 1.3;
+  }
+
+  .tag-pill:hover { border-color: var(--border-accent); color: var(--eggshell); background: var(--bg4); }
+
+  .tag-pill.selected {
+    background: var(--orange-dim);
+    border-color: var(--orange);
+    color: var(--eggshell);
+  }
+
+  .tag-pill .tag-code {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--orange);
+    margin-right: 4px;
+  }
+
+  .tag-pill.selected .tag-code { color: var(--orange-light); }
+
+  /* ── INFO BOX ── */
+  .info-box {
+    background: var(--lavender-dim);
+    border: 1px solid rgba(168,155,194,0.18);
+    border-radius: 10px;
+    padding: 13px 16px;
+    margin-bottom: 22px;
+    display: flex;
+    gap: 11px;
+    align-items: flex-start;
+  }
+
+  .info-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+  .info-text { font-size: 12px; color: var(--lavender); line-height: 1.6; }
+  .info-text strong { color: var(--eggshell); font-weight: 600; }
+
+  /* ── CARD ENTRIES ── */
+  .card-entries {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 14px;
+  }
+
+  .card-entry {
+    background: var(--bg2);
+    border: 1.5px solid var(--border-mid);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .card-entry:hover { border-color: var(--border-strong); }
+
+  .card-entry-inner { padding: 18px 20px 20px; }
+
+  .card-entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+
+  .card-entry-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--orange);
+  }
+
+  .card-entry-remove {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--eggshell-dim);
+    cursor: pointer;
+    padding: 4px 9px;
+    border-radius: 6px;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+  }
+
+  .card-entry-remove:hover {
+    color: var(--red);
+    border-color: rgba(224,85,85,0.2);
+    background: var(--red-dim);
+  }
+
+  /* ── INLINE UPLOAD (per card) ── */
+  .card-upload-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 14px 20px;
+    background: rgba(0,0,0,0.15);
+    border-top: 1px solid var(--border);
+  }
+
+  .card-upload-slot { }
+
+  .card-upload-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--eggshell-dim);
+    margin-bottom: 7px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .card-upload-label .req-dot {
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--orange);
+    flex-shrink: 0;
+  }
+
+  .card-upload-label .opt-tag {
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    color: var(--bg5);
+    background: var(--bg4);
+    padding: 1px 5px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+  }
+
+  .upload-mini-zone {
+    border: 1.5px dashed rgba(212,98,42,0.18);
+    border-radius: 9px;
+    background: var(--bg3);
+    padding: 0;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+    min-height: 64px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+
+  .upload-mini-zone:hover,
+  .upload-mini-zone.drag-over {
+    border-color: var(--orange);
+    background: rgba(212,98,42,0.04);
+  }
+
+  .upload-mini-zone.has-file {
+    border-style: solid;
+    border-color: rgba(76,175,130,0.3);
+    background: rgba(76,175,130,0.04);
+  }
+
+  .upload-mini-zone input[type="file"] {
+    position: absolute; inset: 0;
+    opacity: 0; cursor: pointer;
+    width: 100%; height: 100%;
+  }
+
+  .upload-mini-icon { font-size: 18px; opacity: 0.45; line-height: 1; }
+  .upload-mini-text {
+    font-size: 10px;
+    color: var(--eggshell-dim);
+    letter-spacing: 0.03em;
+  }
+
+  .upload-mini-preview {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 8px;
+  }
+
+  .mini-thumb-wrap { position: relative; }
+
+  .mini-thumb {
+    width: 48px; height: 60px;
+    object-fit: cover;
+    border-radius: 5px;
+    border: 1px solid var(--border-mid);
+    display: block;
+  }
+
+  /* ── ADD CARD BTN ── */
+  .add-card-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    width: 100%;
+    padding: 13px;
+    border-radius: 10px;
+    border: 1.5px dashed rgba(212,98,42,0.18);
+    background: transparent;
+    color: var(--orange);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.02em;
+  }
+
+  .add-card-btn:hover { border-color: var(--orange); background: var(--orange-dim); }
+
+  /* ── REVIEW BLOCKS ── */
+  .review-block {
+    background: var(--bg2);
+    border: 1.5px solid var(--border-mid);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .review-block-header {
+    padding: 10px 18px;
+    border-bottom: 1px solid var(--border);
+    background: var(--eggshell-faint);
+  }
+
+  .review-block-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--eggshell-dim);
+  }
+
+  .review-block-body { padding: 16px 18px; }
+
+  .review-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 20px;
+  }
+
+  .review-field-label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--eggshell-dim);
+    margin-bottom: 4px;
+  }
+
+  .review-field-val { font-size: 14px; color: var(--eggshell); font-weight: 500; }
+
+  .review-field-val.is-source {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--orange-light);
+  }
+
+  .review-card-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .review-card-line:last-child { border-bottom: none; padding-bottom: 0; }
+  .review-card-member { color: var(--eggshell); font-weight: 500; }
+  .review-card-meta   { color: var(--eggshell-dim); font-size: 12px; }
+
+  .review-card-fmt {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: var(--bg4);
+    border: 1px solid var(--border-mid);
+    color: var(--eggshell-dim);
+    margin-left: auto;
+    white-space: nowrap;
+  }
+
+  .review-card-photo-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    flex-shrink: 0;
+    opacity: 0.7;
+  }
+
+  /* ── NAVIGATION ── */
+  .form-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 36px;
+    padding-top: 22px;
+    border-top: 1px solid var(--border);
+    gap: 12px;
+  }
+
+  .btn-back {
+    padding: 11px 20px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border-mid);
+    background: transparent;
+    color: var(--eggshell-dim);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+  }
+
+  .btn-back:hover { border-color: var(--border-strong); color: var(--eggshell); }
+  .btn-back:disabled { opacity: 0.25; cursor: not-allowed; pointer-events: none; }
+
+  .btn-next {
+    padding: 12px 28px;
+    border-radius: 10px;
+    border: none;
+    background: var(--orange);
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.03em;
+    flex-shrink: 0;
+  }
+
+  .btn-next:hover {
+    background: var(--orange-light);
+    box-shadow: 0 4px 24px rgba(212,98,42,0.3);
+    transform: translateY(-1px);
+  }
+
+  .btn-submit { background: var(--green); }
+  .btn-submit:hover { background: #5dcf98; box-shadow: 0 4px 24px rgba(76,175,130,0.3); }
+  .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  /* ── SUCCESS ── */
+  .success-screen {
+    display: none;
+    text-align: center;
+    padding: 72px 0 40px;
+    animation: sectionIn 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .success-screen.active { display: block; }
+
+  .success-icon {
+    width: 68px; height: 68px;
+    border-radius: 50%;
+    background: var(--green-dim);
+    border: 1.5px solid var(--green-border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    margin: 0 auto 22px;
+    box-shadow: 0 0 40px rgba(76,175,130,0.12);
+  }
+
+  .success-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 44px;
+    letter-spacing: 0.1em;
+    color: var(--eggshell);
+    margin-bottom: 12px;
+    line-height: 1;
+  }
+
+  .success-sub {
+    font-size: 14px;
+    color: var(--eggshell-dim);
+    line-height: 1.65;
+    max-width: 380px;
+    margin: 0 auto 28px;
+  }
+
+  .fxp-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--orange-dim);
+    border: 1px solid var(--border-accent);
+    border-radius: 20px;
+    padding: 9px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--orange-light);
+    margin-bottom: 28px;
+    letter-spacing: 0.04em;
+  }
+
+  .btn-submit-another {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 11px 22px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border-mid);
+    background: transparent;
+    color: var(--eggshell-dim);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.02em;
+  }
+
+  .btn-submit-another:hover {
+    border-color: var(--border-strong);
+    color: var(--eggshell);
+    background: var(--eggshell-faint);
+  }
+
+  /* ── VALIDATION ── */
+  .field-error {
+    font-size: 11px;
+    color: var(--red);
+    margin-top: 6px;
+    display: none;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.04em;
+  }
+
+  .field-group.has-error input,
+  .field-group.has-error select,
+  .field-group.has-error textarea {
+    border-color: rgba(224,85,85,0.38);
+    background: rgba(224,85,85,0.03);
+  }
+
+  .field-group.has-error .field-error { display: block; }
+
+  #submitError {
+    margin-top: 14px;
+    padding: 12px 16px;
+    background: var(--red-dim);
+    border: 1px solid rgba(224,85,85,0.22);
+    border-radius: 10px;
+    font-size: 13px;
+    color: var(--red);
+    line-height: 1.5;
+    display: none;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.03em;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 560px) {
+    .field-row { grid-template-columns: 1fr; }
+    .review-grid { grid-template-columns: 1fr; gap: 12px; }
+    .card-upload-row { grid-template-columns: 1fr; }
+    .page-title { font-size: 40px; }
+    .page-wrap { padding: 0 16px 80px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+  <header class="site-header">
+    <div class="logo">POCA-GO</div>
+    <div class="header-tag">Catalog Submission · Beta</div>
+  </header>
+
+  <div class="page-title-block">
+    <div class="page-eyebrow">Community Catalog</div>
+    <h1 class="page-title">Submit a Card</h1>
+    <p class="page-subtitle">Help build the most complete K-pop photocard catalog ever made. Every approved submission earns FXP and gets credited to your Poca-Go profile.</p>
+  </div>
+
+  <!-- PROGRESS — 3 steps -->
+  <div class="progress-track" id="progressTrack">
+    <div class="progress-step active" id="step-1" onclick="jumpToStep(1)">
+      <div class="step-dot">1</div>
+      <div class="step-label">Release</div>
+    </div>
+    <div class="progress-step" id="step-2" onclick="jumpToStep(2)">
+      <div class="step-dot">2</div>
+      <div class="step-label">Cards</div>
+    </div>
+    <div class="progress-step" id="step-3" onclick="jumpToStep(3)">
+      <div class="step-dot">3</div>
+      <div class="step-label">Review</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- SECTION 1 — RELEASE INFO      -->
+  <!-- ══════════════════════════════ -->
+  <div class="form-section active" id="section-1">
+    <div class="section-heading">
+      <div class="section-number">01</div>
+      <div class="section-title-block">
+        <div class="section-title">Release Info</div>
+        <div class="section-desc">Tell us which release these cards belong to. Be as specific as possible — this links your cards to the right catalog entry.</div>
+      </div>
+    </div>
+
+    <div class="field-group" id="fg-artist">
+      <label>Artist <span class="required">*</span></label>
+      <input type="text" id="artist" placeholder="e.g. BLACKPINK, BTS, Jennie" oninput="markFilled(this)">
+      <div class="field-error">Artist name is required.</div>
+    </div>
+
+    <div class="field-row">
+      <div class="field-group" id="fg-release">
+        <label>Release Name <span class="required">*</span></label>
+        <input type="text" id="release" placeholder="e.g. BORN PINK, FML" oninput="markFilled(this)">
+        <div class="field-error">Release name is required.</div>
+      </div>
+      <div class="field-group" id="fg-market">
+        <label>Market <span class="required">*</span></label>
+        <select id="market" onchange="markFilled(this)">
+          <option value="" disabled selected>Select…</option>
+          <option value="KR">KR — Korean</option>
+          <option value="JP">JP — Japanese</option>
+          <option value="Global">Global</option>
+        </select>
+        <div class="field-error">Market is required.</div>
+      </div>
+    </div>
+
+    <div class="field-group" id="fg-release-type">
+      <label>Release Type <span class="required">*</span></label>
+      <select id="releaseType" onchange="markFilled(this)">
+        <option value="" disabled selected>Select a release type…</option>
+        <optgroup label="Albums">
+          <option value="mini_album">Mini Album (4–7 songs)</option>
+          <option value="full_album">Full Album (8+ songs)</option>
+          <option value="single_album">Single Album (1–3 songs)</option>
+          <option value="repackage">Repackage</option>
+          <option value="special_edition">Special Edition</option>
+        </optgroup>
+        <optgroup label="Format Variants">
+          <option value="kit_kihno">Kit / Kihno Album</option>
+          <option value="weverse_album">Weverse Album</option>
+        </optgroup>
+        <optgroup label="Annual / Event">
+          <option value="seasons_greetings">Season's Greetings</option>
+          <option value="event">Event / Pop-up / Concert</option>
+          <option value="jp_release">JP Release</option>
+          <option value="collaboration">Collaboration</option>
+        </optgroup>
+        <option value="other">Other / Unsure</option>
+      </select>
+      <div class="field-error">Release type is required.</div>
+    </div>
+
+    <div class="field-group" id="fg-version">
+      <label>Version Name <span class="required">*</span> <span class="hint">The specific variant within this release</span></label>
+      <input type="text" id="version" placeholder="e.g. Ver. A, Weverse POB, Lucky Draw, First Press" oninput="markFilled(this)">
+      <div class="field-error">Version name is required.</div>
+    </div>
+
+    <div class="field-group">
+      <label>Source Tag <span class="required">*</span> <span class="hint">How this version is obtained</span></label>
+      <input type="hidden" id="sourceTagVal">
+      <div class="tag-grid" id="sourceTagGrid">
+        <div class="tag-pill" onclick="selectTag('sourceTagVal','ALB',this)"><span class="tag-code">ALB</span> Album Inclusion</div>
+        <div class="tag-pill" onclick="selectTag('sourceTagVal','POB',this)"><span class="tag-code">POB</span> Pre-Order Benefit</div>
+        <div class="tag-pill" onclick="selectTag('sourceTagVal','FP',this)"><span class="tag-code">FP</span> First Press</div>
+        <div class="tag-pill" onclick="selectTag('sourceTagVal','LD',this)"><span class="tag-code">LD</span> Lucky Draw</div>
+        <div class="tag-pill" onclick="selectTag('sourceTagVal','FS',this)"><span class="tag-code">FS</span> Fansign</div>
+        <div class="tag-pill" onclick="selectTag('sourceTagVal','BC',this)"><span class="tag-code">BC</span> Broadcast</div>
+        <div class="tag-pill" onclick="selectTag('sourceTagVal','CON',this)"><span class="tag-code">CON</span> Concert / Tour</div>
+        <div class="tag-pill" onclick="selectTag('sourceTagVal','EVENT',this)"><span class="tag-code">EVENT</span> Event / Pop-up</div>
+        <div class="tag-pill" onclick="selectTag('sourceTagVal','MERCH',this)"><span class="tag-code">MERCH</span> Merchandise</div>
+        <div class="tag-pill" onclick="selectTag('sourceTagVal','MAG',this)"><span class="tag-code">MAG</span> Magazine</div>
+      </div>
+      <div class="field-error" id="sourceTagError" style="display:none;">Please select a source tag.</div>
+    </div>
+
+    <div class="field-group" id="fg-retailer" style="display:none;">
+      <label>Retailer <span class="hint">Which store offered this POB or First Press?</span></label>
+      <select id="retailer" onchange="markFilled(this)">
+        <option value="" disabled selected>Select retailer…</option>
+        <option>Weverse Shop</option>
+        <option>Soundwave</option>
+        <option>Yes24</option>
+        <option>Ktown4u</option>
+        <option>Makestar</option>
+        <option>Hanteo</option>
+        <option>Tower Records (JP)</option>
+        <option>HMV Japan</option>
+        <option>Amazon (JP)</option>
+        <option>Other</option>
+      </select>
+    </div>
+
+    <div class="field-row">
+      <div class="field-group">
+        <label>Release Date <span class="hint">Approximate is fine</span></label>
+        <input type="date" id="releaseDate" onchange="markFilled(this)">
+      </div>
+      <div class="field-group">
+        <label>Source Reference <span class="hint">URL where you confirmed this info</span></label>
+        <input type="text" id="sourceUrl" placeholder="e.g. kpopalbums.com, Weverse Shop link" oninput="markFilled(this)">
+      </div>
+    </div>
+
+    <div class="form-nav">
+      <button class="btn-back" disabled>← Back</button>
+      <button class="btn-next" onclick="nextSection(1)">Cards →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- SECTION 2 — CARDS + IMAGES    -->
+  <!-- ══════════════════════════════ -->
+  <div class="form-section" id="section-2">
+    <div class="section-heading">
+      <div class="section-number">02</div>
+      <div class="section-title-block">
+        <div class="section-title">Cards & Photos</div>
+        <div class="section-desc">Add one entry per card and attach its photo directly. A single version can have 4 cards or 40+ — document everything you have.</div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <div class="info-icon">💡</div>
+      <div class="info-text">
+        <strong>One block = one card.</strong> Each member is a separate card. Attach the photo right here so there's no guesswork about which image belongs to which card.<br><br>
+        <strong>Photo tip:</strong> Flat lay · plain light background · no flash glare · card fills the frame · in focus.
+      </div>
+    </div>
+
+    <div class="card-entries" id="cardEntries"></div>
+
+    <button class="add-card-btn" onclick="addCardEntry()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add Another Card
+    </button>
+
+    <div class="form-nav">
+      <button class="btn-back" onclick="prevSection(2)">← Back</button>
+      <button class="btn-next" onclick="nextSection(2)">Review →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- SECTION 3 — REVIEW & SUBMIT   -->
+  <!-- ══════════════════════════════ -->
+  <div class="form-section" id="section-3">
+    <div class="section-heading">
+      <div class="section-number">03</div>
+      <div class="section-title-block">
+        <div class="section-title">Review & Submit</div>
+        <div class="section-desc">Check everything looks right before submitting. We'll review and credit you when it goes live.</div>
+      </div>
+    </div>
+
+    <div class="review-block">
+      <div class="review-block-header">
+        <div class="review-block-label">Release Summary</div>
+      </div>
+      <div class="review-block-body">
+        <div class="review-grid">
+          <div>
+            <div class="review-field-label">Artist</div>
+            <div class="review-field-val" id="rev-artist">—</div>
+          </div>
+          <div>
+            <div class="review-field-label">Release</div>
+            <div class="review-field-val" id="rev-release">—</div>
+          </div>
+          <div>
+            <div class="review-field-label">Version</div>
+            <div class="review-field-val" id="rev-version">—</div>
+          </div>
+          <div>
+            <div class="review-field-label">Market · Type</div>
+            <div class="review-field-val" id="rev-market-type">—</div>
+          </div>
+          <div>
+            <div class="review-field-label">Source</div>
+            <div class="review-field-val is-source" id="rev-source">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="review-block">
+      <div class="review-block-header">
+        <div class="review-block-label">Cards</div>
+      </div>
+      <div class="review-block-body" id="rev-cards">—</div>
+    </div>
+
+    <div class="field-group">
+      <label>Notes for Reviewer <span class="hint">Anything you're unsure about? Flag it here.</span></label>
+      <textarea id="reviewNotes" placeholder="e.g. Not sure if this is Ver. A or Ver. B — the album packaging was unclear." oninput="markFilled(this)"></textarea>
+    </div>
+
+    <div class="field-group" id="fg-contributor">
+      <label>Your Handle <span class="required">*</span> <span class="hint">For catalog credit</span></label>
+      <input type="text" id="contributor" placeholder="@username or your collector name" oninput="markFilled(this)">
+      <div class="field-error">Your name or handle is required for credit.</div>
+    </div>
+
+    <div class="info-box">
+      <div class="info-icon">⚡</div>
+      <div class="info-text">
+        <strong>FXP incoming.</strong> Approved submissions earn Fighting Experience Points on your Poca-Go profile. The more complete and accurate your submission, the faster it gets approved.
+      </div>
+    </div>
+
+    <div id="submitError"></div>
+
+    <div class="form-nav">
+      <button class="btn-back" onclick="prevSection(3)">← Back</button>
+      <button class="btn-next btn-submit" id="submitBtn" onclick="submitForm()">Submit Entry ✓</button>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">✓</div>
+    <div class="success-title">Submission Received</div>
+    <p class="success-sub">Thanks for contributing to the Poca-Go catalog. We'll review your entry and reach out if we have questions. Your credit will appear on the catalog entry when it's approved.</p>
+    <div class="fxp-badge">⚡ FXP pending approval</div>
+    <br>
+    <button class="btn-submit-another" onclick="resetForm()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Submit Another Release
+    </button>
+  </div>
+
+</div>
+
+<script>
+  // ── CONFIG ────────────────────────────────────────────────
+  const SUPABASE_URL      = 'https://ougoysxxqrorjrpksmfk.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im91Z295c3h4cXJvcmpycGtzbWZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NDcyMDksImV4cCI6MjA5MDMyMzIwOX0.cEzQ-WlBe-eucPAC55rQ6PkO-2PNFWDSx7VTjo9FeLs';
+
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // ── STATE ─────────────────────────────────────────────────
+  let currentSection    = 1;
+  let cardCount         = 0;
+  let completedSections = new Set();
+
+  const FORMAT_TAGS = [
+    { code: 'PC',   label: 'Photocard',      desc: '~54×86mm standard' },
+    { code: 'POL',  label: 'Polaroid',        desc: 'Polaroid format' },
+    { code: 'SPOL', label: 'Signed Polaroid', desc: 'Hand-signed, one-of-a-kind' },
+    { code: 'MPC',  label: 'Mounted PC',      desc: 'Stiff-backed display card' },
+    { code: 'PST',  label: 'Postcard',        desc: '~100×148mm' },
+    { code: 'TC',   label: 'Trading Card',    desc: 'Random pack format' },
+    { code: 'LEN',  label: 'Lenticular',      desc: 'Flip / 3D lens effect' },
+    { code: 'MID',  label: 'Mini ID',         desc: '~33×45mm small format' },
+  ];
+
+  // ── INIT ──────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    addCardEntry();
+  });
+
+  // ── TAG SELECTION ─────────────────────────────────────────
+  function selectTag(inputId, value, el) {
+    document.getElementById(inputId).value = value;
+    el.closest('.tag-grid').querySelectorAll('.tag-pill').forEach(p => p.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('sourceTagError').style.display = 'none';
+    document.getElementById('fg-retailer').style.display =
+      (value === 'POB' || value === 'FP') ? 'block' : 'none';
+  }
+
+  function selectCardTag(inputId, value, el) {
+    document.getElementById(inputId).value = value;
+    el.closest('.tag-grid').querySelectorAll('.tag-pill').forEach(p => p.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  // ── CARD ENTRIES ──────────────────────────────────────────
+  function addCardEntry() {
+    cardCount++;
+    const idx       = cardCount;
+    const container = document.getElementById('cardEntries');
+
+    const formatPills = FORMAT_TAGS.map(f =>
+      `<div class="tag-pill" onclick="selectCardTag('fmt-${idx}','${f.code}',this)" title="${f.desc}">
+        <span class="tag-code">${f.code}</span> ${f.label}
+      </div>`
+    ).join('');
+
+    container.insertAdjacentHTML('beforeend', `
+      <div class="card-entry" id="cardEntry-${idx}">
+        <div class="card-entry-inner">
+          <div class="card-entry-header">
+            <div class="card-entry-num">Card ${idx}</div>
+            ${idx > 1 ? `<div class="card-entry-remove" onclick="removeCardEntry(${idx})">Remove</div>` : ''}
+          </div>
+
+          <div class="field-row">
+            <div class="field-group">
+              <label>Member <span class="required">*</span></label>
+              <input type="text" id="member-${idx}" placeholder='e.g. Jennie, "Group"' oninput="markFilled(this)">
+            </div>
+            <div class="field-group">
+              <label>Variant Label <span class="hint">A, B, POB, etc.</span></label>
+              <input type="text" id="variant-${idx}" placeholder='e.g. A, B, POB-WV' oninput="markFilled(this)">
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label>Format <span class="required">*</span></label>
+            <input type="hidden" id="fmt-${idx}">
+            <div class="tag-grid">${formatPills}</div>
+          </div>
+
+          <div class="field-group" style="margin-top:14px; margin-bottom:0;">
+            <label>Notes <span class="hint">Selfie ver., holographic finish, unusual details</span></label>
+            <input type="text" id="notes-${idx}" placeholder='e.g. "Selfie ver.", holographic finish' oninput="markFilled(this)">
+          </div>
+        </div>
+
+        <!-- Inline image upload — locked to this card -->
+        <div class="card-upload-row">
+          <div class="card-upload-slot">
+            <div class="card-upload-label">
+              <span class="req-dot"></span> Front photo
+            </div>
+            <div class="upload-mini-zone" id="frontZone-${idx}">
+              <input type="file" id="front-${idx}" accept="image/*"
+                onchange="handleMiniUpload(${idx}, 'front')"
+                ondragover="this.closest('.upload-mini-zone').classList.add('drag-over')"
+                ondragleave="this.closest('.upload-mini-zone').classList.remove('drag-over')"
+                ondrop="this.closest('.upload-mini-zone').classList.remove('drag-over')">
+              <div class="upload-mini-icon" id="frontIcon-${idx}">🖼</div>
+              <div class="upload-mini-text" id="frontText-${idx}">Tap to add</div>
+              <div class="upload-mini-preview" id="frontPreview-${idx}" style="display:none;"></div>
+            </div>
+          </div>
+          <div class="card-upload-slot">
+            <div class="card-upload-label">
+              Back photo <span class="opt-tag">optional</span>
+            </div>
+            <div class="upload-mini-zone" id="backZone-${idx}">
+              <input type="file" id="back-${idx}" accept="image/*"
+                onchange="handleMiniUpload(${idx}, 'back')"
+                ondragover="this.closest('.upload-mini-zone').classList.add('drag-over')"
+                ondragleave="this.closest('.upload-mini-zone').classList.remove('drag-over')"
+                ondrop="this.closest('.upload-mini-zone').classList.remove('drag-over')">
+              <div class="upload-mini-icon" id="backIcon-${idx}">🔄</div>
+              <div class="upload-mini-text" id="backText-${idx}">Tap to add</div>
+              <div class="upload-mini-preview" id="backPreview-${idx}" style="display:none;"></div>
+            </div>
+          </div>
+        </div>
+      </div>`);
+  }
+
+  function removeCardEntry(idx) {
+    document.getElementById(`cardEntry-${idx}`)?.remove();
+  }
+
+  // ── MINI UPLOAD HANDLER ───────────────────────────────────
+  function handleMiniUpload(idx, side) {
+    const input   = document.getElementById(`${side}-${idx}`);
+    const zone    = document.getElementById(`${side}Zone-${idx}`);
+    const icon    = document.getElementById(`${side}Icon-${idx}`);
+    const text    = document.getElementById(`${side}Text-${idx}`);
+    const preview = document.getElementById(`${side}Preview-${idx}`);
+
+    if (!input.files || !input.files[0]) return;
+
+    const file   = input.files[0];
+    const reader = new FileReader();
+
+    reader.onload = e => {
+      // Show thumbnail, hide placeholder
+      preview.innerHTML = '';
+      const wrap = document.createElement('div');
+      wrap.className = 'mini-thumb-wrap';
+      const img = document.createElement('img');
+      img.src = e.target.result;
+      img.className = 'mini-thumb';
+      wrap.appendChild(img);
+      preview.appendChild(wrap);
+
+      icon.style.display    = 'none';
+      text.style.display    = 'none';
+      preview.style.display = 'flex';
+      zone.classList.add('has-file');
+    };
+
+    reader.readAsDataURL(file);
+  }
+
+  // ── MARK FILLED ───────────────────────────────────────────
+  function markFilled(el) {
+    el.classList.toggle('has-value', el.value !== '');
+    el.closest('.field-group')?.classList.remove('has-error');
+  }
+
+  // ── VALIDATION ────────────────────────────────────────────
+  function validateSection(n) {
+    let valid = true;
+
+    if (n === 1) {
+      [
+        { id: 'artist',      fgId: 'fg-artist' },
+        { id: 'release',     fgId: 'fg-release' },
+        { id: 'market',      fgId: 'fg-market' },
+        { id: 'releaseType', fgId: 'fg-release-type' },
+        { id: 'version',     fgId: 'fg-version' },
+      ].forEach(c => {
+        if (!document.getElementById(c.id).value) {
+          document.getElementById(c.fgId).classList.add('has-error');
+          valid = false;
+        } else {
+          document.getElementById(c.fgId).classList.remove('has-error');
+        }
+      });
+      if (!document.getElementById('sourceTagVal').value) {
+        document.getElementById('sourceTagError').style.display = 'block';
+        valid = false;
+      }
+    }
+
+    if (n === 2) {
+      if (document.querySelectorAll('.card-entry').length === 0) valid = false;
+    }
+
+    if (n === 3) {
+      const contrib = document.getElementById('contributor');
+      if (!contrib.value.trim()) {
+        document.getElementById('fg-contributor').classList.add('has-error');
+        valid = false;
+      } else {
+        document.getElementById('fg-contributor').classList.remove('has-error');
+      }
+    }
+
+    return valid;
+  }
+
+  // ── NAVIGATION ────────────────────────────────────────────
+  function nextSection(n) {
+    if (!validateSection(n)) return;
+    if (n === 2) buildReview();
+    completedSections.add(n);
+    showSection(n + 1);
+  }
+
+  function prevSection(n) { showSection(n - 1); }
+
+  function jumpToStep(n) {
+    if (n <= currentSection || completedSections.has(n - 1)) showSection(n);
+  }
+
+  function showSection(n) {
+    document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+    const target = document.getElementById(`section-${n}`);
+    if (target) {
+      target.classList.add('active');
+      currentSection = n;
+      updateProgress(n);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  function updateProgress(active) {
+    for (let i = 1; i <= 3; i++) {
+      const step = document.getElementById(`step-${i}`);
+      if (!step) continue;
+      step.classList.remove('active', 'done');
+      const dot = step.querySelector('.step-dot');
+      if (i < active) {
+        step.classList.add('done');
+        dot.textContent = '✓';
+      } else {
+        if (i === active) step.classList.add('active');
+        dot.textContent = String(i);
+      }
+    }
+  }
+
+  // ── REVIEW BUILD ──────────────────────────────────────────
+  function buildReview() {
+    document.getElementById('rev-artist').textContent      = document.getElementById('artist').value || '—';
+    document.getElementById('rev-release').textContent     = document.getElementById('release').value || '—';
+    document.getElementById('rev-version').textContent     = document.getElementById('version').value || '—';
+    document.getElementById('rev-market-type').textContent =
+      `${document.getElementById('market').value || '—'} · ${document.getElementById('releaseType').value || '—'}`;
+    document.getElementById('rev-source').textContent      = document.getElementById('sourceTagVal').value || '—';
+
+    const entries = document.querySelectorAll('.card-entry');
+    let html = '';
+    entries.forEach(entry => {
+      const id      = entry.id.replace('cardEntry-', '');
+      const member  = document.getElementById(`member-${id}`)?.value || 'Unknown';
+      const fmt     = document.getElementById(`fmt-${id}`)?.value || '';
+      const variant = document.getElementById(`variant-${id}`)?.value || '';
+      const hasPhoto = document.getElementById(`front-${id}`)?.files?.length > 0;
+
+      html += `<div class="review-card-line">
+        ${hasPhoto ? '<span class="review-card-photo-dot" title="Photo attached"></span>' : ''}
+        <span class="review-card-member">${member}</span>
+        ${variant ? `<span class="review-card-meta">· ${variant}</span>` : ''}
+        ${fmt     ? `<span class="review-card-fmt">${fmt}</span>` : ''}
+      </div>`;
+    });
+    document.getElementById('rev-cards').innerHTML = html ||
+      '<span style="font-size:13px;color:var(--eggshell-dim);">No cards added.</span>';
+  }
+
+  // ── SUBMIT ────────────────────────────────────────────────
+  async function submitForm() {
+    if (!validateSection(3)) return;
+
+    const btn          = document.getElementById('submitBtn');
+    const originalText = btn.textContent;
+    btn.textContent    = 'Submitting…';
+    btn.disabled       = true;
+
+    const errEl = document.getElementById('submitError');
+    errEl.style.display = 'none';
+
+    try {
+
+      // STEP 1: Upsert contributor
+      const handle = document.getElementById('contributor').value.trim();
+      const { data: contributorData, error: contributorError } = await supabaseClient
+        .from('contributors')
+        .upsert({ handle }, { onConflict: 'handle', ignoreDuplicates: false })
+        .select('id')
+        .single();
+
+      if (contributorError) throw contributorError;
+      const contributorId = contributorData.id;
+
+      // STEP 2: Build cards_data array — one entry per card
+      const cardsData = [];
+      document.querySelectorAll('.card-entry').forEach(entry => {
+        const id           = entry.id.replace('cardEntry-', '');
+        const member       = document.getElementById(`member-${id}`)?.value?.trim();
+        const card_format  = document.getElementById(`fmt-${id}`)?.value || null;
+        const variant_label= document.getElementById(`variant-${id}`)?.value?.trim() || null;
+        const notes        = document.getElementById(`notes-${id}`)?.value?.trim() || null;
+        if (member) cardsData.push({ member, card_format, variant_label, notes });
+      });
+
+      // STEP 3: Insert catalog_submission row
+      const submissionPayload = {
+        contributor_id:    contributorId,
+        artist_name:       document.getElementById('artist').value.trim(),
+        release_name:      document.getElementById('release').value.trim(),
+        release_format:    document.getElementById('releaseType').value || null,
+        release_market:    document.getElementById('market').value || null,
+        version_name:      document.getElementById('version').value.trim(),
+        source:            document.getElementById('sourceTagVal').value || null,
+        retailer:          document.getElementById('retailer').value || null,
+        release_date:      document.getElementById('releaseDate').value || null,
+        source_url:        document.getElementById('sourceUrl').value.trim() || null,
+        cards_data:        cardsData,
+        contributor_notes: document.getElementById('reviewNotes').value.trim() || null,
+        status:            'pending',
+      };
+
+      const { data: submissionData, error: submissionError } = await supabaseClient
+        .from('catalog_submissions')
+        .insert(submissionPayload)
+        .select('id')
+        .single();
+
+      if (submissionError) throw submissionError;
+      const submissionId = submissionData.id;
+
+      // STEP 4: Upload images — each card's photos indexed by card position
+      // card_index is the zero-based position in the cards_data array
+      // so Jennie=0, Jisoo=1 etc — set by construction, never by upload order
+      const imageUploads = [];
+      const cardEntries  = document.querySelectorAll('.card-entry');
+
+      cardEntries.forEach((entry, cardPosition) => {
+        const id = entry.id.replace('cardEntry-', '');
+
+        ['front', 'back'].forEach(side => {
+          const input = document.getElementById(`${side}-${id}`);
+          if (!input || !input.files || !input.files[0]) return;
+
+          const file = input.files[0];
+          const ext  = file.name.split('.').pop();
+          const path = `submissions/${submissionId}/${side}_${cardPosition}.${ext}`;
+
+          imageUploads.push(
+            supabaseClient.storage.from('submissions').upload(path, file, { upsert: true })
+              .then(({ error }) => {
+                if (error) { console.warn(`${side} upload error (card ${cardPosition}):`, error); return; }
+                return supabaseClient.from('submission_images').insert({
+                  submission_id: submissionId,
+                  storage_path:  path,
+                  side,
+                  card_index:    cardPosition,
+                });
+              })
+          );
+        });
+      });
+
+      await Promise.allSettled(imageUploads);
+
+      // STEP 5: Increment contributor count
+      await supabaseClient.rpc('increment_submissions', { contributor_uuid: contributorId });
+
+      showSuccessScreen();
+
+    } catch (err) {
+      console.error('Submission failed:', err);
+      btn.textContent    = originalText;
+      btn.disabled       = false;
+      errEl.textContent  = `Something went wrong: ${err.message}. Please try again.`;
+      errEl.style.display = 'block';
+    }
+  }
+
+  // ── SUCCESS ───────────────────────────────────────────────
+  function showSuccessScreen() {
+    document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+    document.getElementById('successScreen').classList.add('active');
+    updateProgress(4); // beyond step 3 = all done
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ── RESET ─────────────────────────────────────────────────
+  function resetForm() {
+    currentSection = 1;
+    cardCount      = 0;
+    completedSections.clear();
+
+    // Clear text inputs, selects, dates, textareas
+    document.querySelectorAll('input[type="text"], input[type="date"], select, textarea').forEach(el => {
+      el.value = '';
+      el.classList.remove('has-value');
+    });
+
+    // Reset hidden + tag pills
+    document.getElementById('sourceTagVal').value = '';
+    document.querySelectorAll('.tag-pill').forEach(p => p.classList.remove('selected'));
+
+    // Hide conditional fields + errors
+    document.getElementById('sourceTagError').style.display = 'none';
+    document.getElementById('fg-retailer').style.display    = 'none';
+    document.querySelectorAll('.field-group').forEach(fg => fg.classList.remove('has-error'));
+
+    // Clear submit error + reset button
+    const errEl = document.getElementById('submitError');
+    errEl.style.display = 'none'; errEl.textContent = '';
+    const btn = document.getElementById('submitBtn');
+    btn.textContent = 'Submit Entry ✓'; btn.disabled = false;
+
+    // Wipe card entries and seed a fresh one
+    // (inline file inputs are destroyed with the container — no manual replacement needed)
+    document.getElementById('cardEntries').innerHTML = '';
+    addCardEntry();
+
+    // Hide success, go to section 1
+    document.getElementById('successScreen').classList.remove('active');
+    showSection(1);
+  }
+</script>
+</body>
+</html>
