@@ -1037,10 +1037,13 @@
 
     <div class="card-entries" id="cardEntries"></div>
 
-    <button class="add-card-btn" onclick="addCardEntry()">
+    <button class="add-card-btn" id="addCardBtn" onclick="addCardEntry()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       Add Another Card
     </button>
+    <div id="cardLimitNotice" style="display:none;margin-top:10px;font-family:'DM Mono',monospace;font-size:11px;color:var(--eggshell-dim);letter-spacing:0.06em;text-align:center;">
+      Maximum 10 cards per submission reached. Submit this batch and start a new submission for additional cards.
+    </div>
 
     <div class="form-nav">
       <button class="btn-back" onclick="prevSection(2)">← Back</button>
@@ -1183,7 +1186,28 @@
   }
 
   // ── CARD ENTRIES ──────────────────────────────────────────
+  const CARD_LIMIT = 10;
+
+  function updateAddCardBtn() {
+    const count  = document.querySelectorAll('.card-entry').length;
+    const btn    = document.getElementById('addCardBtn');
+    const notice = document.getElementById('cardLimitNotice');
+    if (!btn) return;
+    if (count >= CARD_LIMIT) {
+      btn.disabled = true;
+      btn.style.opacity = '0.4';
+      btn.style.cursor  = 'not-allowed';
+      if (notice) notice.style.display = 'block';
+    } else {
+      btn.disabled = false;
+      btn.style.opacity = '';
+      btn.style.cursor  = '';
+      if (notice) notice.style.display = 'none';
+    }
+  }
+
   function addCardEntry() {
+    if (document.querySelectorAll('.card-entry').length >= CARD_LIMIT) return;
     cardCount++;
     const idx       = cardCount;
     const container = document.getElementById('cardEntries');
@@ -1259,10 +1283,13 @@
           </div>
         </div>
       </div>`);
+
+    updateAddCardBtn();
   }
 
   function removeCardEntry(idx) {
     document.getElementById(`cardEntry-${idx}`)?.remove();
+    updateAddCardBtn();
   }
 
   // ── MINI UPLOAD HANDLER ───────────────────────────────────
@@ -1441,7 +1468,19 @@
       if (contributorError) throw contributorError;
       const contributorId = contributorData.id;
 
-      // STEP 2: Build cards_data array — one entry per card
+      // STEP 1b: Check daily submission limit (3 per day)
+      const { data: dailyCount, error: limitError } = await supabaseClient
+        .rpc('get_daily_submission_count', { contributor_handle: handle });
+
+      if (limitError) throw limitError;
+
+      if (dailyCount >= 3) {
+        btn.textContent = originalText;
+        btn.disabled    = false;
+        errEl.textContent  = `You've reached the 3 submission limit for today. Come back tomorrow to submit more — thank you for contributing!`;
+        errEl.style.display = 'block';
+        return;
+      }
       const cardsData = [];
       document.querySelectorAll('.card-entry').forEach(entry => {
         const id           = entry.id.replace('cardEntry-', '');
@@ -1565,6 +1604,7 @@
     // (inline file inputs are destroyed with the container — no manual replacement needed)
     document.getElementById('cardEntries').innerHTML = '';
     addCardEntry();
+    updateAddCardBtn();
 
     // Hide success, go to section 1
     document.getElementById('successScreen').classList.remove('active');
